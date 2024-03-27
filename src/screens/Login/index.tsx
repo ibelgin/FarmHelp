@@ -1,21 +1,26 @@
 import React, {memo, useEffect} from 'react';
 import {
+  Alert,
   Text,
   StyleSheet,
   Image,
   Pressable,
   ActivityIndicator,
 } from 'react-native';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 import {StackNavigationProp} from '@react-navigation/stack';
 import defaultStyle from 'theme/defaultStyle';
 
 import Container from 'components/Container';
 import Images from 'assets/images';
+import Routes from 'routes/routes';
 
 import Icons from 'react-native-vector-icons/AntDesign';
 
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import firestore from '@react-native-firebase/firestore';
+import {setUser} from 'redux/userSlice';
+import {storeData} from 'functions/storage';
 
 interface LoginProps {
   navigation: StackNavigationProp<any, any>;
@@ -23,9 +28,10 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = memo(({navigation}) => {
   const theme = useSelector((state: any) => state.theme);
+  // const user = useSelector((state: any) => state.user);
   const styles = getStyles(theme);
+  const dispatch = useDispatch();
 
-  const [user, setUser] = React.useState<any>({});
   const [loading, setLoading] = React.useState<boolean>(false);
 
   useEffect(() => {
@@ -34,14 +40,46 @@ const Login: React.FC<LoginProps> = memo(({navigation}) => {
     });
   }, [navigation]);
 
-  const checkIfUserExists = async (userid: any) => {};
+  const checkIfUserExists = async (userInfo: any) => {
+    try {
+      const userRef = firestore().collection('Users').doc(userInfo.id);
+      const doc = await userRef.get();
+
+      if (doc.exists) {
+        if (doc.data()?.mode === 'farmer') {
+          const data = {...userInfo, mode: 'farmer'};
+          dispatch(setUser(data));
+          storeData('user', data);
+          navigation.replace(Routes.FarmerHome);
+        } else {
+          const data = {...userInfo, mode: 'buyer'};
+          storeData('user', data);
+          dispatch(setUser(data));
+          navigation.replace(Routes.BuyerHome);
+        }
+      } else {
+        storeData('user', userInfo);
+        navigation.navigate(Routes.Register);
+      }
+      setLoading(false);
+    } catch (error) {
+      Alert.alert(
+        'FarmHelp',
+        'Some Issue Occured when trying to fetch the user information',
+      );
+      setLoading(false);
+    }
+  };
 
   const signIn = async () => {
+    setLoading(true);
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      console.log(userInfo);
+      dispatch(setUser(userInfo.user));
+      checkIfUserExists(userInfo.user);
     } catch (error) {
+      setLoading(false);
       console.log(error);
     }
     // const userInfo = {
@@ -63,7 +101,6 @@ const Login: React.FC<LoginProps> = memo(({navigation}) => {
     //       'https://lh3.googleusercontent.com/a/ACg8ocIukjrpfsQIpjB0dxV0oFpEVZ2ULXueUNi2tSHhRmn_IUk=s120',
     //   },
     // };
-    // setUser(userInfo);
   };
   return (
     <Container style={styles.container}>
