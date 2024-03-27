@@ -28,10 +28,10 @@ const Splash: React.FC<SplashProps> = memo(({navigation}) => {
             navigation.replace(Routes.Login);
           } else if (data.mode === 'farmer') {
             dispatch(setUser(data));
-            navigation.replace(Routes.FarmerHome);
+            navigation.replace(Routes.FarmerTabs);
           } else {
             dispatch(setUser(data));
-            navigation.replace(Routes.BuyerHome);
+            navigation.replace(Routes.BuyerTabs);
           }
         });
       } catch {

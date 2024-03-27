@@ -50,12 +50,12 @@ const Login: React.FC<LoginProps> = memo(({navigation}) => {
           const data = {...userInfo, mode: 'farmer'};
           dispatch(setUser(data));
           storeData('user', data);
-          navigation.replace(Routes.FarmerHome);
+          navigation.replace(Routes.FarmerTabs);
         } else {
           const data = {...userInfo, mode: 'buyer'};
           storeData('user', data);
           dispatch(setUser(data));
-          navigation.replace(Routes.BuyerHome);
+          navigation.replace(Routes.BuyerTabs);
         }
       } else {
         storeData('user', userInfo);
@@ -151,6 +151,7 @@ const getStyles = (theme: any) =>
     description: {
       paddingHorizontal: 20,
       marginTop: 5,
+      color: 'gray',
     },
     buttonpressable: {
       padding: 17,

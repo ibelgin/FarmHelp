@@ -69,7 +69,7 @@ const FarmerRegistraion: React.FC<FarmerRegistraionProps> = memo(
             const data = {...user, mode: 'farmer'};
             storeData('user', data);
             dispatch(setUser(data));
-            navigation.replace(Routes.FarmerHome);
+            navigation.replace(Routes.FarmerTabs);
           });
         }
       } catch (error) {

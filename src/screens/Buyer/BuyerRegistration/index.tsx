@@ -66,7 +66,7 @@ const BuyerRegistration: React.FC<BuyerRegistrationProps> = memo(
             const data = {...user, mode: 'buyer'};
             storeData('user', data);
             dispatch(setUser(data));
-            navigation.navigate(Routes.BuyerHome);
+            navigation.navigate(Routes.BuyerTabs);
           });
         }
       } catch (error) {
