@@ -20,6 +20,7 @@ import FarmerHome from 'screens/Farmer/FarmerHome';
 import FarmerAI from 'screens/Farmer/FarmerAI';
 import FarmerOrders from 'screens/Farmer/FarmerOrders';
 import FarmerStore from 'screens/Farmer/FarmerStore';
+import AddProduct from 'screens/Farmer/AddProduct';
 
 //Buyer Screen's
 import BuyerRegistration from 'screens/Buyer/BuyerRegistration';
@@ -195,6 +196,13 @@ const RootStack = memo(() => {
       <Stack.Screen
         name={Routes.FarmerTabs}
         component={FarmerTabs}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name={Routes.AddProduct}
+        component={AddProduct}
         options={{
           headerShown: false,
         }}

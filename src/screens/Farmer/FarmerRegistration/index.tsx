@@ -62,6 +62,7 @@ const FarmerRegistraion: React.FC<FarmerRegistraionProps> = memo(
             location: location,
             products: [{}],
             orders: [{}],
+            verified: false,
             createdAt: new Date(),
           });
           await storeData('loggedin', true).then(() => {

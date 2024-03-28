@@ -22,6 +22,7 @@ const Routes: any = {
   FarmerOrders: 'FarmerOrders',
   FarmerStore: 'FarmerStore',
   FarmerSearch: 'FarmerSearch',
+  AddProduct: 'AddProduct',
 
   // Buyer Screens
   BuyerHome: 'BuyerHome',

@@ -4,6 +4,10 @@ const Images: any = {
   horizontal: require('./horizontal.jpg'),
   shopping: require('./shopping.png'),
   shipping: require('./shipping.png'),
+  nocharts: require('./nocharts.png'),
+  emptyproducts: require('./emptyproducts.png'),
+  nocharts2: require('./nocharts2.png'),
+  landscape: require('./landscape.png'),
 };
 
 export default Images;
