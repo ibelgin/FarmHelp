@@ -33,10 +33,10 @@ const BuyerView: React.FC<BuyerViewProps> = memo(({navigation, route}) => {
 
   const [userData, setUserData] = useState<any>({products: [{}]});
   const [loading, setLoading] = useState<boolean>(true);
-
   const [selectedQuantities, setSelectedQuantities] = useState<{
     [key: string]: number;
   }>({});
+  const [selectionMade, setSelectionMade] = useState<boolean>(false);
 
   const incrementQuantity = (productId: string, maxQuantity: number) => {
     const currentQuantity = selectedQuantities[productId] || 0;
@@ -45,9 +45,8 @@ const BuyerView: React.FC<BuyerViewProps> = memo(({navigation, route}) => {
         ...prevState,
         [productId]: currentQuantity + 1,
       }));
+      setSelectionMade(true);
     }
-
-    addToCart();
   };
 
   const decrementQuantity = (productId: string) => {
@@ -57,12 +56,11 @@ const BuyerView: React.FC<BuyerViewProps> = memo(({navigation, route}) => {
         ...prevState,
         [productId]: currentQuantity - 1,
       }));
+      setSelectionMade(true);
     }
-
-    addToCart();
   };
 
-  const addToCart = async () => {
+  const addToCart = useCallback(async () => {
     const selectedProducts = Object.keys(selectedQuantities)
       .map(productId => {
         if (userData.products.hasOwnProperty(productId)) {
@@ -83,7 +81,16 @@ const BuyerView: React.FC<BuyerViewProps> = memo(({navigation, route}) => {
       farmers_incart: route.params.farmerid.id,
       products: selectedProducts,
     });
-  };
+  }, [selectedQuantities, userData, user.id, route.params.farmerid.id]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (selectionMade) {
+        addToCart();
+        setSelectionMade(false);
+      }
+    }, [addToCart, selectionMade]),
+  );
 
   const getUser = useCallback(async () => {
     setLoading(true);

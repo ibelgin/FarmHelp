@@ -59,8 +59,8 @@ const BuyerRegistration: React.FC<BuyerRegistrationProps> = memo(
             mode: 'buyer',
             gstin: gstin,
             orders: [],
-            cart: [],
-            createdAt: new Date().toISOString(), // Convert date to ISO string format
+            cart: {farmers_incart: '', products: [{}]},
+            createdAt: new Date().toISOString(),
           });
           await storeData('loggedin', true).then(() => {
             setLoading(false);

@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   Image,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import {useSelector} from 'react-redux';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -21,10 +22,11 @@ interface BuyerCartProps {
   navigation: StackNavigationProp<any, any>;
 }
 
-const BuyerCart: React.FC<BuyerCartProps> = memo(() => {
+const BuyerCart: React.FC<BuyerCartProps> = memo(({navigation}) => {
   const theme = useSelector((state: any) => state.theme);
   const user = useSelector((state: any) => state.user);
-  const [cartData, setCartData] = useState<any>(null); // State to store cart data
+  const [cartData, setCartData] = useState<any>({products: []});
+  const [totalPrice, setTotalPrice] = useState<number>(0.0);
   const styles = getStyles(theme);
 
   const fetchCartData = useCallback(async () => {
@@ -32,7 +34,13 @@ const BuyerCart: React.FC<BuyerCartProps> = memo(() => {
       const userCartRef = database().ref(`Users/${user.id}/cart`);
       const snapshot = await userCartRef.once('value');
       const cartData1 = snapshot.val();
-      setCartData(cartData1);
+      setCartData(cartData1 || {products: []});
+      const dat = cartData1?.products
+        ?.reduce((total: number, item: any) => {
+          return total + item.price * item.cartquantity;
+        }, 0)
+        .toFixed(2);
+      setTotalPrice(dat);
     } catch (error) {
       console.error('Error fetching cart data:', error);
     }
@@ -58,7 +66,6 @@ const BuyerCart: React.FC<BuyerCartProps> = memo(() => {
       }));
 
       if (updatedProducts.length === 0) {
-        // Clear cart if the updated products array is empty
         await clearCart(user.id);
       }
     } catch (error) {
@@ -68,7 +75,7 @@ const BuyerCart: React.FC<BuyerCartProps> = memo(() => {
 
   return (
     <Container style={styles.container}>
-      {cartData?.products && cartData.products.length > 0 ? (
+      {cartData && cartData.products && cartData.products.length > 0 ? (
         <>
           <Text style={styles.heading}>Your Cart</Text>
           <FlatList
@@ -98,6 +105,12 @@ const BuyerCart: React.FC<BuyerCartProps> = memo(() => {
             )}
             keyExtractor={(item, index) => index.toString()}
           />
+          <TouchableWithoutFeedback
+            onPress={() => navigation.navigate('Payment', {totalPrice})}>
+            <View style={styles.payNowButton}>
+              <Text style={styles.payNowText}>Pay Now Rs. {totalPrice}</Text>
+            </View>
+          </TouchableWithoutFeedback>
         </>
       ) : (
         <View style={styles.containerEmpty}>
@@ -218,6 +231,19 @@ const getStyles = (theme: any) =>
       textAlign: 'center',
       marginTop: 10,
       paddingHorizontal: 80,
+    },
+    payNowButton: {
+      position: 'absolute',
+      bottom: 20,
+      right: 20,
+      backgroundColor: theme.primary,
+      padding: 15,
+      borderRadius: 10,
+    },
+    payNowText: {
+      color: 'white',
+      fontWeight: 'bold',
+      fontSize: 16,
     },
   });
 
