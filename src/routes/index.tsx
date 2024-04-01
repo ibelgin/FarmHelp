@@ -20,6 +20,7 @@ import FarmerHome from 'screens/Farmer/FarmerHome';
 import FarmerAI from 'screens/Farmer/FarmerAI';
 import FarmerOrders from 'screens/Farmer/FarmerOrders';
 import FarmerStore from 'screens/Farmer/FarmerStore';
+import FarmerView from 'screens/Farmer/FarmerView';
 import AddProduct from 'screens/Farmer/AddProduct';
 
 //Buyer Screen's
@@ -30,6 +31,7 @@ import BuyerOrders from 'screens/Buyer/BuyerOrders';
 import BuyerSettings from 'screens/Buyer/BuyerSettings';
 import BuyerSearch from 'screens/Buyer/BuyerSearch';
 import FarmerSearch from 'screens/Farmer/FarmerSearch';
+import BuyerView from 'screens/Buyer/BuyerView';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -203,6 +205,20 @@ const RootStack = memo(() => {
       <Stack.Screen
         name={Routes.AddProduct}
         component={AddProduct}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name={Routes.FarmerView}
+        component={FarmerView}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name={Routes.BuyerView}
+        component={BuyerView}
         options={{
           headerShown: false,
         }}

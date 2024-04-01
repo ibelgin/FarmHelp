@@ -17,7 +17,7 @@ import Container from 'components/Container';
 import Button from 'components/Button';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-import firestore from '@react-native-firebase/firestore';
+import database from '@react-native-firebase/database';
 import {storeData} from 'functions/storage';
 import Constants from 'functions/Constants';
 import {setUser} from 'redux/userSlice';
@@ -38,21 +38,21 @@ const FarmerRegistraion: React.FC<FarmerRegistraionProps> = memo(
     const [location, setLocation] = useState('');
 
     const [loading, setLoading] = useState(false);
-
     const createUser = async () => {
       setLoading(true);
-      const userRef = firestore().collection('Users').doc(user.id);
+      const userRef = database().ref(`Users/${user.id}`);
 
       try {
-        const userSnapshot = await userRef.get();
+        const userSnapshot = await userRef.once('value');
 
-        if (userSnapshot.exists) {
+        if (userSnapshot.exists()) {
           Alert.alert('FarmHelp', 'User Already exists');
           navigation.replace(Routes.Login);
           setLoading(false);
           return;
         } else {
           await userRef.set({
+            id: user.id,
             email: user.email,
             name: user.name,
             photo: user.photo,
@@ -60,10 +60,10 @@ const FarmerRegistraion: React.FC<FarmerRegistraionProps> = memo(
             mode: 'farmer',
             phone: phone,
             location: location,
-            products: [{}],
-            orders: [{}],
+            products: [],
+            orders: [],
             verified: false,
-            createdAt: new Date(),
+            createdAt: new Date().toISOString(),
           });
           await storeData('loggedin', true).then(() => {
             setLoading(false);
@@ -75,7 +75,7 @@ const FarmerRegistraion: React.FC<FarmerRegistraionProps> = memo(
         }
       } catch (error) {
         setLoading(false);
-        Alert.alert('FarmHelp', 'Some Error Occoured');
+        Alert.alert('FarmHelp', 'Some Error Occurred');
       }
     };
 

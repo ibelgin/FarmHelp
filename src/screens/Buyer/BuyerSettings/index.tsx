@@ -5,6 +5,8 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import defaultStyle from 'theme/defaultStyle';
 
 import Container from 'components/Container';
+import {storeData} from 'functions/storage';
+import Routes from 'routes/routes';
 
 interface BuyerSettingsProps {
   navigation: StackNavigationProp<any, any>;
@@ -20,9 +22,14 @@ const BuyerSettings: React.FC<BuyerSettingsProps> = memo(({navigation}) => {
     }, 3000);
   }, [navigation]);
 
+  const LogOut = () => {
+    storeData('user', null);
+    navigation.push(Routes.Login);
+  };
+
   return (
     <Container style={styles.container}>
-      <Text>Buyer Settings</Text>
+      <Text onPress={() => LogOut()}>Log Out</Text>
     </Container>
   );
 });

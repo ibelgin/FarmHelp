@@ -1694,10 +1694,20 @@
     opencollective-postinstall "^2.0.3"
     superstruct "^0.6.2"
 
+"@react-native-firebase/database@^19.1.1":
+  version "19.1.1"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/database/-/database-19.1.1.tgz#e60f3afbf4e7bcd9dfdba257ceffa9eafa82a5e7"
+  integrity sha512-FI8w30fs1gVsKcWR++zt3ykeoMr+fUxI1oUM8BN4AzYwZsVYqnAeejjj17ndZKdGs+zaCGQgDv6a80Nc+VXwmQ==
+
 "@react-native-firebase/firestore@^19.1.0":
   version "19.1.0"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/firestore/-/firestore-19.1.0.tgz#fd771e1402ded94ddd551de64f63629faec288b8"
   integrity sha512-zlWXaV+jEDxGCEZ25ALujcCnskT9moMOhOGsXUINVuf9uogCiPHoYihtYu14mJHRuH529wZIhOF27Fc7UADnTA==
+
+"@react-native-firebase/storage@^19.1.1":
+  version "19.1.1"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/storage/-/storage-19.1.1.tgz#55cc32719b47c4c98a6abc3970d0d597e3613d5a"
+  integrity sha512-aNpcZS8opfPjCAhJ5HIr5xeLJqk9djZnfTrhAVRLp+VTbhczzBk9ytAeW8NFQYZ/G+LKZwZ9clkPBGB9bB+YBg==
 
 "@react-native-google-signin/google-signin@^11.0.0":
   version "11.0.0"
@@ -5880,6 +5890,11 @@ react-native-gesture-handler@^2.15.0:
     invariant "^2.2.4"
     lodash "^4.17.21"
     prop-types "^15.7.2"
+
+react-native-image-picker@^7.1.2:
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-7.1.2.tgz#383849d1953caf4578874a1f5e5dd11c737bd5cd"
+  integrity sha512-b5y5nP60RIPxlAXlptn2QwlIuZWCUDWa/YPUVjgHc0Ih60mRiOg1PSzf0IjHSLeOZShCpirpvSPGnDExIpTRUg==
 
 react-native-reanimated@^3.8.1:
   version "3.8.1"

@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useEffect, useState} from 'react';
+import React, {memo, useCallback, useState} from 'react';
 import {
   Alert,
   View,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Image,
   Pressable,
+  FlatList,
   ScrollView,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
@@ -16,10 +17,12 @@ import Container from 'components/Container';
 import Routes from 'routes/routes';
 import Images from 'assets/images';
 import Constants from 'functions/Constants';
-import firestore from '@react-native-firebase/firestore';
+import database from '@react-native-firebase/database';
 import Icon from 'react-native-vector-icons/AntDesign';
 import TitleTextButton from 'components/TitleTextButton';
 import {setFarmerData} from 'redux/farmerSlice';
+import {useFocusEffect} from '@react-navigation/native';
+import ProductItem from 'components/ProductItem';
 
 interface FarmerHomeProps {
   navigation: StackNavigationProp<any, any>;
@@ -33,26 +36,31 @@ const FarmerHome: React.FC<FarmerHomeProps> = memo(({navigation}) => {
   const styles = getStyles(theme);
 
   const [userData, setUserData] = useState<any>({products: [{}]});
+  const [loading, setLoading] = useState<boolean>(true);
 
   const getUser = useCallback(async () => {
+    setLoading(true);
     try {
-      const userRef = firestore().collection('Users').doc(user.id);
-      const doc = await userRef.get();
-      const dat = doc.data();
+      const userRef = database().ref(`Users/${user.id}`);
+      const snapshot = await userRef.once('value');
+      const dat = snapshot.val();
       setUserData(dat);
       dispatch(setFarmerData(dat));
+      setLoading(false);
     } catch (err) {
+      setLoading(false);
       Alert.alert('FarmHelp', 'Some Error occurred');
     }
   }, [dispatch, user.id]);
 
-  // const getProducts = useCallback(async () => {}, []);
-
   // const getAiPredications = useCallback(async () => {}, []);
 
-  useEffect(() => {
-    getUser();
-  }, [getUser]);
+  useFocusEffect(
+    React.useCallback(() => {
+      getUser();
+      return () => {};
+    }, [getUser]),
+  );
 
   return (
     <Container style={styles.container}>
@@ -105,9 +113,9 @@ const FarmerHome: React.FC<FarmerHomeProps> = memo(({navigation}) => {
         <TitleTextButton
           title={'Listed Products'}
           buttonText="Go To Store"
-          onPress={() => console.log()}
+          onPress={() => navigation.navigate(Routes.FarmerStore)}
         />
-        {userData.products[0].name === undefined ? (
+        {Object.keys(userData.products || {}).length === 0 ? (
           <View style={styles.noproductsview}>
             <View style={styles.background}>
               <Text style={styles.salestext}>No Products</Text>
@@ -117,7 +125,18 @@ const FarmerHome: React.FC<FarmerHomeProps> = memo(({navigation}) => {
               </Text>
             </View>
           </View>
-        ) : null}
+        ) : (
+          <FlatList
+            refreshing={loading}
+            onRefresh={() => getUser()}
+            showsHorizontalScrollIndicator={false}
+            horizontal={true}
+            data={Object.values(userData.products)}
+            renderItem={({item}) => <ProductItem product={item} />}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        )}
+        <View style={styles.line} />
       </ScrollView>
     </Container>
   );
@@ -206,6 +225,9 @@ const getStyles = (theme: any) =>
       height: '100%',
       width: '100%',
       padding: 50,
+    },
+    line: {
+      height: 40,
     },
   });
 

@@ -40,9 +40,7 @@ const Login: React.FC<LoginProps> = memo(({navigation}) => {
     // try {
     //   await GoogleSignin.hasPlayServices();
     //   const userInfo = await GoogleSignin.signIn();
-    //   console.log(userInfo);
     // } catch (error) {
-    //   console.log(error);
     // }
     const userInfo = {
       idToken:

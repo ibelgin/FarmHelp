@@ -16,7 +16,7 @@ import Container from 'components/Container';
 import Button from 'components/Button';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-import firestore from '@react-native-firebase/firestore';
+import database from '@react-native-firebase/database';
 import {storeData} from 'functions/storage';
 import Constants from 'functions/Constants';
 import {setUser} from 'redux/userSlice';
@@ -39,27 +39,28 @@ const BuyerRegistration: React.FC<BuyerRegistrationProps> = memo(
 
     const createUser = async () => {
       setLoading(true);
-      const userRef = firestore().collection('Users').doc(user.id);
+      const userRef = database().ref(`Users/${user.id}`);
 
       try {
-        const userSnapshot = await userRef.get();
+        const userSnapshot = await userRef.once('value');
 
-        if (userSnapshot.exists) {
+        if (userSnapshot.exists()) {
           Alert.alert('FarmHelp', 'User Already exists');
           navigation.replace(Routes.Login);
           setLoading(false);
           return;
         } else {
           await userRef.set({
+            id: user.id,
             email: user.email,
             name: user.name,
             photo: user.photo,
             businessName: business,
             mode: 'buyer',
             gstin: gstin,
-            orders: [{}],
-            cart: [{}],
-            createdAt: new Date(),
+            orders: [],
+            cart: [],
+            createdAt: new Date().toISOString(), // Convert date to ISO string format
           });
           await storeData('loggedin', true).then(() => {
             setLoading(false);
@@ -71,7 +72,7 @@ const BuyerRegistration: React.FC<BuyerRegistrationProps> = memo(
         }
       } catch (error) {
         setLoading(false);
-        Alert.alert('FarmHelp', 'Some Error Occoured');
+        Alert.alert('FarmHelp', 'Some Error Occurred');
       }
     };
 

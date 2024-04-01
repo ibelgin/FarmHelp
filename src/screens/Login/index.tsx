@@ -18,7 +18,7 @@ import Routes from 'routes/routes';
 import Icons from 'react-native-vector-icons/AntDesign';
 
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import firestore from '@react-native-firebase/firestore';
+import database from '@react-native-firebase/database';
 import {setUser} from 'redux/userSlice';
 import {storeData} from 'functions/storage';
 
@@ -42,17 +42,19 @@ const Login: React.FC<LoginProps> = memo(({navigation}) => {
 
   const checkIfUserExists = async (userInfo: any) => {
     try {
-      const userRef = firestore().collection('Users').doc(userInfo.id);
-      const doc = await userRef.get();
+      const userRef = database().ref(`Users/${userInfo.id}`);
+      const snapshot = await userRef.once('value');
 
-      if (doc.exists) {
-        if (doc.data()?.mode === 'farmer') {
-          const data = {...userInfo, mode: 'farmer'};
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        const mode = userData?.mode || 'buyer'; // Default mode to 'buyer' if not found
+        const data = {...userInfo, mode};
+
+        if (mode === 'farmer') {
           dispatch(setUser(data));
           storeData('user', data);
           navigation.replace(Routes.FarmerTabs);
         } else {
-          const data = {...userInfo, mode: 'buyer'};
           storeData('user', data);
           dispatch(setUser(data));
           navigation.replace(Routes.BuyerTabs);
@@ -61,11 +63,12 @@ const Login: React.FC<LoginProps> = memo(({navigation}) => {
         storeData('user', userInfo);
         navigation.navigate(Routes.Register);
       }
+
       setLoading(false);
     } catch (error) {
       Alert.alert(
         'FarmHelp',
-        'Some Issue Occured when trying to fetch the user information',
+        'Some Issue Occurred when trying to fetch the user information',
       );
       setLoading(false);
     }

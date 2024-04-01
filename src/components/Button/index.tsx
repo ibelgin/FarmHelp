@@ -38,7 +38,11 @@ const Button: React.FC<ButtonProps> = memo(
 
     const renderIcon = () => {
       if (!iconName) {
-        return null;
+        return (
+          <View style={styles.iconview}>
+            <Text style={[styles.title, textStyle]}>{title}</Text>
+          </View>
+        );
       }
 
       const iconComponent = (

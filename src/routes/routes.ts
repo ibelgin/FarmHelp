@@ -22,6 +22,7 @@ const Routes: any = {
   FarmerOrders: 'FarmerOrders',
   FarmerStore: 'FarmerStore',
   FarmerSearch: 'FarmerSearch',
+  FarmerView: 'FarmerView',
   AddProduct: 'AddProduct',
 
   // Buyer Screens
@@ -30,6 +31,7 @@ const Routes: any = {
   BuyerOrders: 'BuyerOrders',
   BuyerSettings: 'BuyerSettings',
   BuyerSearch: 'BuyerSearch',
+  BuyerView: 'BuyerView',
 };
 
 export default Routes;

@@ -44,6 +44,8 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We might need access to your photo gallery for uploading your product images to your store</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

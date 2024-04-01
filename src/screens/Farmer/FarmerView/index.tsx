@@ -14,41 +14,31 @@ import defaultStyle from 'theme/defaultStyle';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Icons from 'react-native-vector-icons/MaterialIcons';
 import Images from 'assets/images';
-import Routes from 'routes/routes';
-import {storeData} from 'functions/storage';
 import RBSheet from 'components/RBSheet';
 import {useFocusEffect} from '@react-navigation/native';
 import {setFarmerData} from 'redux/farmerSlice';
 import database from '@react-native-firebase/database';
-import StoreProduct from 'components/StoreProduct';
 import Constants from 'functions/Constants';
 
-interface FarmerStoreProps {
+interface FarmerViewProps {
   navigation: StackNavigationProp<any, any>;
+  route: any;
 }
 
-const FarmerStore: React.FC<FarmerStoreProps> = memo(({navigation}) => {
+const FarmerView: React.FC<FarmerViewProps> = memo(({navigation, route}) => {
   const theme = useSelector((state: any) => state.theme);
-  const user = useSelector((state: any) => state.user);
   const farmerData = useSelector((state: any) => state.farmerData);
   const styles = getStyles(theme);
   const refRBSheet = useRef<any>(null);
   const dispatch = useDispatch();
 
-  const [isContactInfo, setContactInfo] = useState<boolean>(false);
   const [userData, setUserData] = useState<any>({products: [{}]});
   const [loading, setLoading] = useState<boolean>(true);
-
-  const LogOut = () => {
-    storeData('user', null);
-    refRBSheet.current.close();
-    navigation.push(Routes.Login);
-  };
 
   const getUser = useCallback(async () => {
     setLoading(true);
     try {
-      const userRef = database().ref(`Users/${user.id}`);
+      const userRef = database().ref(`Users/${route.params.farmerid.id}`);
       const snapshot = await userRef.once('value');
       const dat = snapshot.val();
       setUserData(dat);
@@ -58,7 +48,7 @@ const FarmerStore: React.FC<FarmerStoreProps> = memo(({navigation}) => {
       setLoading(false);
       Alert.alert('FarmHelp', 'Some Error occurred');
     }
-  }, [dispatch, user.id]);
+  }, [dispatch, route.params.farmerid.id]);
 
   useFocusEffect(
     useCallback(() => {
@@ -67,87 +57,47 @@ const FarmerStore: React.FC<FarmerStoreProps> = memo(({navigation}) => {
     }, [getUser]),
   );
 
-  const onPressDelete = (product: any) => {
-    Alert.alert(
-      'Delete Product',
-      'Are you sure you want to delete this product?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          onPress: async () => {
-            setLoading(true);
-            try {
-              await database()
-                .ref(`Users/${user.id}/products/${product.id}`)
-                .remove()
-                .then(() => {
-                  getUser();
-                });
-            } catch (error) {
-              Alert.alert('FarmHelp', 'Some Error occurred');
-            }
-          },
-          style: 'destructive',
-        },
-      ],
-      {cancelable: true},
-    );
-  };
-
   return (
     <View style={styles.container}>
       <View>
-        <RBSheet ref={refRBSheet} height={180} closeOnDragDown>
-          {!isContactInfo ? (
-            <>
-              <View style={styles.verified}>
-                <Icons
-                  name="verified"
-                  color={theme.primary}
-                  style={styles.iconverification}
-                  size={18}
-                />
-                <Text style={styles.verification}>Apply for Verification</Text>
-              </View>
-              <Pressable onPress={() => LogOut()}>
-                <Text style={styles.logout}>Log Out</Text>
-              </Pressable>
-            </>
-          ) : (
-            <View>
-              <View style={styles.verified}>
-                <Icons
-                  name="email"
-                  color={'gray'}
-                  style={styles.iconverification}
-                  size={18}
-                />
-                <Text style={styles.verification}>{farmerData.email}</Text>
-              </View>
-              <View style={styles.verified}>
-                <Icons
-                  name="phone"
-                  color={'gray'}
-                  style={styles.iconverification}
-                  size={18}
-                />
-                <Text style={styles.verification}>{farmerData.phone}</Text>
-              </View>
+        <RBSheet ref={refRBSheet} height={150} closeOnDragDown>
+          <View>
+            <View style={styles.verified}>
+              <Icons
+                name="email"
+                color={'gray'}
+                style={styles.iconverification}
+                size={18}
+              />
+              <Text style={styles.verification}>{farmerData.email}</Text>
             </View>
-          )}
+            <View style={styles.verified}>
+              <Icons
+                name="phone"
+                color={'gray'}
+                style={styles.iconverification}
+                size={18}
+              />
+              <Text style={styles.verification}>{farmerData.phone}</Text>
+            </View>
+          </View>
         </RBSheet>
         <Image source={Images.landscape} style={styles.banner} />
+        <View style={styles.backIconContainer}>
+          <Pressable
+            style={styles.backIcon}
+            onPress={() => navigation.goBack()}>
+            <Icons name="arrow-back" size={20} color="white" />
+          </Pressable>
+        </View>
         <View style={styles.profilecardview}>
           <View>
             <View style={styles.title}>
               <Text style={styles.farmername}>{farmerData.businessName} </Text>
-              <Icons name="verified" color={theme.primary} size={14} />
+              {userData.verified === true ? (
+                <Icons name="verified" color={theme.primary} size={14} />
+              ) : null}
             </View>
-
             <Text style={styles.location}>
               <Icon name="location-outline" size={16} color={theme.primary} />{' '}
               {farmerData.location}{' '}
@@ -159,38 +109,31 @@ const FarmerStore: React.FC<FarmerStoreProps> = memo(({navigation}) => {
           <Pressable
             style={styles.contact}
             onPress={() => {
-              setContactInfo(true);
               refRBSheet.current.open();
             }}>
             <Text>
               <Icon name="call" color={theme.text} /> {'  '} Contact Information
             </Text>
           </Pressable>
-          <Pressable
-            style={styles.addbutton}
-            onPress={() => {
-              setContactInfo(false);
-              refRBSheet.current.open();
-            }}>
-            <Icon name="settings-outline" color={theme.text} size={19} />
-          </Pressable>
         </View>
         <View style={styles.logoutview}>
-          <Text style={styles.heading}>My Products</Text>
-          <Pressable onPress={() => navigation.navigate(Routes.AddProduct)}>
-            <Text style={styles.logouttext}>Add Product</Text>
-          </Pressable>
+          <Text style={styles.heading}>Products Available</Text>
         </View>
       </View>
       <FlatList
         refreshing={loading}
         onRefresh={() => getUser()}
         data={Object.values(userData.products || {})}
-        renderItem={({item}) => (
-          <StoreProduct
-            product={item}
-            onPressDelete={() => onPressDelete(item)}
-          />
+        renderItem={({item}: any) => (
+          <View style={styles.mainview}>
+            <Image source={{uri: item.image}} style={styles.image} />
+            <View style={styles.details}>
+              <Text style={styles.price}>{'Rs. ' + item.price}</Text>
+              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.stock}>Available Stocks</Text>
+              <Text style={styles.highlight}>{item.quantity}</Text>
+            </View>
+          </View>
         )}
         keyExtractor={(item, index) => index.toString()}
         ListEmptyComponent={
@@ -243,7 +186,7 @@ const getStyles = (theme: any) =>
     },
     contact: {
       height: 50,
-      width: '80%',
+      width: '100%',
       ...defaultStyle.center,
       backgroundColor: theme.transparancy,
     },
@@ -254,8 +197,8 @@ const getStyles = (theme: any) =>
     },
     contactinfoview: {
       height: 50,
-      margin: 10,
-      ...defaultStyle.flexRow,
+      margin: 20,
+      ...defaultStyle.flexRowCenter,
     },
     addbutton: {
       height: 50,
@@ -338,6 +281,58 @@ const getStyles = (theme: any) =>
       width: '100%',
       padding: 50,
     },
+
+    mainview: {
+      height: 130,
+      marginHorizontal: 20,
+      ...defaultStyle.flexRow,
+      backgroundColor: theme.transparancy,
+      marginTop: 15,
+      position: 'relative',
+    },
+    image: {
+      flex: 1,
+      height: '70%',
+      borderRadius: 3,
+      marginHorizontal: 15,
+    },
+    name: {
+      fontSize: 15,
+      fontWeight: 'bold',
+      color: theme.text,
+    },
+    price: {
+      fontSize: 17,
+      fontWeight: '500',
+      color: theme.text,
+    },
+    stock: {
+      color: 'gray',
+      fontWeight: '400',
+      fontSize: 13,
+      marginTop: 5,
+    },
+    details: {
+      flex: 2,
+      paddingVertical: 10,
+      paddingHorizontal: 5,
+    },
+    highlight: {
+      color: theme.text,
+      fontSize: 15,
+    },
+    backIconContainer: {
+      position: 'absolute',
+      top: 50,
+      left: 20,
+      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+      borderRadius: 50,
+      height: 40,
+      width: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    backIcon: {},
   });
 
-export default FarmerStore;
+export default FarmerView;

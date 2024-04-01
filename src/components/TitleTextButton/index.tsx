@@ -16,12 +16,12 @@ const TitleTextButton = memo(
     return (
       <View style={styles.container}>
         <View style={styles.title_view}>
-          <Text style={styles.text} numberOfLines={1}>
+          <Text style={styles.text} numberOfLines={1} adjustsFontSizeToFit>
             {title}
           </Text>
         </View>
         <TouchableOpacity style={styles.button_style} onPress={onPress}>
-          <Text style={styles.textdesc} numberOfLines={1}>
+          <Text style={styles.textdesc} numberOfLines={1} adjustsFontSizeToFit>
             {buttonText}
           </Text>
         </TouchableOpacity>
