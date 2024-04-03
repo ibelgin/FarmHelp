@@ -78,13 +78,13 @@ const styles = StyleSheet.create({
   },
   tagsContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap', // Wrap tags to next line if they overflow
+    flexWrap: 'wrap',
     marginTop: 5,
     borderRadius: 10,
   },
   tag: {
     marginRight: 5,
-    marginBottom: 5, // Add marginBottom to create space between tags
+    marginBottom: 5,
     fontSize: 12,
     backgroundColor: '#f0f0f0',
     paddingVertical: 2,

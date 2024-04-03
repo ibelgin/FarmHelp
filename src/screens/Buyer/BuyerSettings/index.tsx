@@ -2,7 +2,6 @@ import React, {memo} from 'react';
 import {Text, StyleSheet, Image, View} from 'react-native';
 import {useSelector} from 'react-redux';
 import {StackNavigationProp} from '@react-navigation/stack';
-import Icons from 'react-native-vector-icons/MaterialIcons';
 import {storeData} from 'functions/storage';
 import Routes from 'routes/routes';
 import Images from 'assets/images';
@@ -25,16 +24,13 @@ const BuyerSettings: React.FC<BuyerSettingsProps> = memo(({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Image source={Images.landscape} style={styles.banner} />
+      <Image source={Images.storeland} style={styles.banner} />
       <View style={styles.profilecardview}>
         <View>
           <View style={styles.title}>
             <Text style={styles.farmername}>{buyerData.givenName} </Text>
           </View>
-          <Text style={styles.location}>
-            <Icons name="email" size={16} color={theme.text} />{' '}
-            {buyerData.email}{' '}
-          </Text>
+          <Text style={styles.location}>{buyerData.email} </Text>
         </View>
         <Image source={{uri: buyerData.photo}} style={styles.photo} />
       </View>

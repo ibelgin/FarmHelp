@@ -115,7 +115,7 @@ const FarmerRegistraion: React.FC<FarmerRegistraionProps> = memo(
             style={styles.input}
             value={phone}
             onChangeText={setPhone}
-            placeholder="22AAAAA0000A1Z5"
+            placeholder="+1 (675) 6756 657"
             placeholderTextColor={'gray'}
           />
 

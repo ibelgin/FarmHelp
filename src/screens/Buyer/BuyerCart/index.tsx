@@ -1,4 +1,4 @@
-import React, {memo, useCallback, useState} from 'react';
+import React, {memo, useCallback, useState, useRef} from 'react';
 import {
   Text,
   StyleSheet,
@@ -6,7 +6,10 @@ import {
   View,
   TouchableOpacity,
   Image,
+  TextInput,
   TouchableWithoutFeedback,
+  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {useSelector} from 'react-redux';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -17,6 +20,10 @@ import Icon from 'react-native-vector-icons/Feather';
 import {useFocusEffect} from '@react-navigation/native';
 import clearCart from 'functions/clearCart';
 import Images from 'assets/images';
+import Routes from 'routes/routes';
+import RBSheet from 'components/RBSheet';
+import Constants from 'functions/Constants';
+import Button from 'components/Button';
 
 interface BuyerCartProps {
   navigation: StackNavigationProp<any, any>;
@@ -24,10 +31,15 @@ interface BuyerCartProps {
 
 const BuyerCart: React.FC<BuyerCartProps> = memo(({navigation}) => {
   const theme = useSelector((state: any) => state.theme);
+  const refRBSheet = useRef<any>(null);
   const user = useSelector((state: any) => state.user);
   const [cartData, setCartData] = useState<any>({products: []});
   const [totalPrice, setTotalPrice] = useState<number>(0.0);
   const styles = getStyles(theme);
+
+  const [phone, setPhone] = useState<any>('');
+  const [location, setLocation] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const fetchCartData = useCallback(async () => {
     try {
@@ -53,6 +65,38 @@ const BuyerCart: React.FC<BuyerCartProps> = memo(({navigation}) => {
     }, [fetchCartData]),
   );
 
+  const handlePlaceOrder = async () => {
+    setLoading(true);
+    try {
+      const orderId = database().ref('Orders').push().key;
+      const orderData = {
+        orderId: orderId,
+        buyerId: user.id,
+        buyerName: user.name,
+        buyerEmail: user.email,
+        farmerId: cartData.farmers_incart,
+        farmerName: cartData.products[0].farmerName,
+        products: cartData.products,
+        totalPrice: totalPrice,
+        createdAt: new Date().toISOString(),
+        state: 'placed',
+        phone: phone,
+        address: location,
+      };
+
+      await database().ref(`Orders/${orderId}`).set(orderData);
+      await clearCart(user.id);
+      setCartData({products: []});
+      setTotalPrice(0);
+      setLoading(false);
+      navigation.navigate(Routes.BuyerOrders);
+      refRBSheet.current.close();
+    } catch (error) {
+      setLoading(false);
+      console.error('Error placing order:', error);
+    }
+  };
+
   const handleDeleteItem = async (index: number) => {
     try {
       const updatedProducts = [...cartData.products];
@@ -75,9 +119,53 @@ const BuyerCart: React.FC<BuyerCartProps> = memo(({navigation}) => {
 
   return (
     <Container style={styles.container}>
+      <RBSheet ref={refRBSheet} height={Constants.height / 2} closeOnDragDown>
+        <ScrollView>
+          <Text style={styles.businessname}>
+            Phone Number
+            <Text style={{color: theme.primary}}> *</Text>
+          </Text>
+          <TextInput
+            style={styles.input}
+            value={phone}
+            onChangeText={setPhone}
+            placeholder="+1 (675) 6756 657"
+            placeholderTextColor={'gray'}
+          />
+          <Text style={styles.businessname}>
+            Location
+            <Text style={{color: theme.primary}}> *</Text>
+          </Text>
+          <TextInput
+            style={styles.address}
+            value={location}
+            onChangeText={setLocation}
+            placeholder={"Tery's Farm, \n14th Street, Texas.\nUSA."}
+            placeholderTextColor={'gray'}
+            multiline={true}
+            numberOfLines={3}
+            blurOnSubmit={false}
+            textAlignVertical="top"
+            textAlign="left"
+          />
+          {loading ? (
+            <View style={styles.activity}>
+              <ActivityIndicator size={'small'} color={theme.primary} />
+            </View>
+          ) : (
+            <Button
+              title="Proceed to Payment"
+              style={styles.button}
+              iconName={'right'}
+              iconSize={13}
+              iconPosition="right"
+              onPress={() => handlePlaceOrder()}
+            />
+          )}
+        </ScrollView>
+      </RBSheet>
       {cartData && cartData.products && cartData.products.length > 0 ? (
         <>
-          <Text style={styles.heading}>Your Cart</Text>
           <FlatList
             data={cartData.products || []}
             renderItem={({item, index}) => (
@@ -105,8 +193,7 @@ const BuyerCart: React.FC<BuyerCartProps> = memo(({navigation}) => {
             )}
             keyExtractor={(item, index) => index.toString()}
           />
-          <TouchableWithoutFeedback
-            onPress={() => navigation.navigate('Payment', {totalPrice})}>
+          <TouchableWithoutFeedback onPress={() => refRBSheet.current.open()}>
             <View style={styles.payNowButton}>
               <Text style={styles.payNowText}>Pay Now Rs. {totalPrice}</Text>
             </View>
@@ -141,14 +228,6 @@ const getStyles = (theme: any) =>
       flex: 1,
       backgroundColor: theme.background,
       ...defaultStyle.center,
-    },
-    heading: {
-      fontSize: 20,
-      fontWeight: '500',
-      color: 'gray',
-      marginBottom: 10,
-      marginHorizontal: 20,
-      marginTop: 20,
     },
     emptyCartText: {
       fontSize: 20,
@@ -244,6 +323,38 @@ const getStyles = (theme: any) =>
       color: 'white',
       fontWeight: 'bold',
       fontSize: 16,
+    },
+    businessname: {
+      margin: 20,
+      fontSize: 16,
+      color: theme.text,
+      marginBottom: 14,
+    },
+    input: {
+      height: 50,
+      paddingHorizontal: 20,
+      marginHorizontal: 20,
+      borderWidth: 1.5,
+      borderRadius: 7,
+      borderColor: '#D7D7D7',
+    },
+    address: {
+      height: 120,
+      padding: 20,
+      paddingTop: 15,
+      marginHorizontal: 20,
+      borderWidth: 1.5,
+      borderRadius: 7,
+      borderColor: '#D7D7D7',
+    },
+    button: {
+      margin: 20,
+    },
+    activity: {
+      height: 50,
+      width: Constants.width,
+      ...defaultStyle.center,
+      marginTop: 20,
     },
   });
 

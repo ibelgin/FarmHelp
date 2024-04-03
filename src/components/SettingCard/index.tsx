@@ -27,7 +27,7 @@ const SettingCard = memo(
         ) : (
           <View style={styles.content}>
             <View style={defaultStyle.flexRow}>
-              <Icon name={icon} size={20} color={theme.text} />
+              <Icon name={icon} size={20} color={'#5c5c5c'} />
               <Text style={styles.subheading}>{title}</Text>
             </View>
           </View>
@@ -58,5 +58,6 @@ const getStyles = (theme: any) =>
     subheading: {
       fontSize: 17,
       paddingLeft: 15,
+      color: '#5c5c5c',
     },
   });

@@ -1,6 +1,7 @@
 import React, {memo, useEffect} from 'react';
 import {
   Alert,
+  View,
   Text,
   StyleSheet,
   Image,
@@ -108,27 +109,29 @@ const Login: React.FC<LoginProps> = memo(({navigation}) => {
   return (
     <Container style={styles.container}>
       <Image source={Images.signin} style={styles.artwork} />
-      <Text style={styles.title}>
-        Welcome to <Text style={{color: theme.primary}}>FarmHelp</Text>
-      </Text>
-      <Text style={styles.description}>Paving the Way for Direct Deals</Text>
-      {loading ? (
-        <ActivityIndicator
-          size={'small'}
-          color={theme.primary}
-          style={styles.activityloader}
-        />
-      ) : (
-        <Pressable style={styles.buttonpressable} onPress={() => signIn()}>
-          <Icons
-            name="google"
-            color={theme.background}
-            size={20}
-            style={styles.icon}
+      <View>
+        <Text style={styles.title}>
+          Welcome to <Text style={{color: theme.primary}}>FarmHelp</Text>
+        </Text>
+        <Text style={styles.description}>Paving the Way for Direct Deals</Text>
+        {loading ? (
+          <ActivityIndicator
+            size={'small'}
+            color={theme.primary}
+            style={styles.activityloader}
           />
-          <Text style={styles.buttontext}>Sign In with Google</Text>
-        </Pressable>
-      )}
+        ) : (
+          <Pressable style={styles.buttonpressable} onPress={() => signIn()}>
+            <Icons
+              name="google"
+              color={theme.background}
+              size={20}
+              style={styles.icon}
+            />
+            <Text style={styles.buttontext}>Sign In with Google</Text>
+          </Pressable>
+        )}
+      </View>
     </Container>
   );
 });
@@ -138,9 +141,10 @@ const getStyles = (theme: any) =>
     container: {
       flex: 1,
       backgroundColor: theme.background,
+      justifyContent: 'space-between',
     },
     artwork: {
-      height: '80%',
+      height: '60%',
     },
     logo: {
       width: '100%',

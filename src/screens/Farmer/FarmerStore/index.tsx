@@ -101,7 +101,7 @@ const FarmerStore: React.FC<FarmerStoreProps> = memo(({navigation}) => {
   return (
     <View style={styles.container}>
       <View>
-        <RBSheet ref={refRBSheet} height={180} closeOnDragDown>
+        <RBSheet ref={refRBSheet} height={150} closeOnDragDown>
           {!isContactInfo ? (
             <>
               <View style={styles.verified}>

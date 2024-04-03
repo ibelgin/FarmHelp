@@ -10,6 +10,8 @@ const Images: any = {
   landscape: require('./landscape.jpg'),
   store: require('./store.png'),
   emptycart: require('./emptycart.jpg'),
+  noorder: require('./noorder.png'),
+  storeland: require('./storeland.png'),
 };
 
 export default Images;
