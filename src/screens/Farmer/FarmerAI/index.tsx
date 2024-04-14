@@ -1,71 +1,100 @@
-import React, {memo, useEffect} from 'react';
-import {View, Image, Text, StyleSheet} from 'react-native';
-import {useSelector} from 'react-redux';
-import {StackNavigationProp} from '@react-navigation/stack';
-import defaultStyle from 'theme/defaultStyle';
-
 import Container from 'components/Container';
-import Images from 'assets/images';
+import TitleTextButton from 'components/TitleTextButton';
+import React, {memo} from 'react';
+import {StyleSheet, Dimensions} from 'react-native';
+import {LineChart} from 'react-native-chart-kit';
 
-interface FarmerAIProps {
-  navigation: StackNavigationProp<any, any>;
-}
+const FarmerAI = memo(() => {
+  const ordersData = generateRandomData();
 
-const FarmerAI: React.FC<FarmerAIProps> = memo(({navigation}) => {
-  const theme = useSelector((state: any) => state.theme);
-  const styles = getStyles(theme);
-
-  useEffect(() => {
-    setTimeout(() => {
-      //   navigation.navigate(Routes.Login);
-    }, 3000);
-  }, [navigation]);
+  const ordersPerMonth = ordersData.map(order => order.orders);
+  const months = ordersData.map(order => order.month);
 
   return (
     <Container style={styles.container}>
-      <View style={styles.secontainer}>
-        <Image
-          source={Images.nocharts2}
-          style={styles.nochartsimage}
-          resizeMode="contain"
-        />
-        <Text style={styles.salestext}>No Data Found</Text>
-        <Text style={styles.salesdescription}>
-          Add more products or Create more sales for Predictions and Charts
-        </Text>
-      </View>
+      <TitleTextButton
+        title={'Prediction for Next 5  Months'}
+        onPress={() => console.log('')}
+      />
+      <LineChart
+        data={{
+          labels: months,
+          datasets: [
+            {
+              data: ordersPerMonth,
+            },
+          ],
+        }}
+        width={Dimensions.get('window').width - 20}
+        height={220}
+        yAxisSuffix=" order"
+        chartConfig={{
+          backgroundColor: '#ffffff',
+          backgroundGradientFrom: '#ffffff',
+          backgroundGradientTo: '#ffffff',
+          decimalPlaces: 0,
+          color: (opacity = 1) => `#59C08C`,
+          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          style: {
+            borderRadius: 16,
+          },
+
+          propsForDots: {
+            r: '1',
+            strokeWidth: '1',
+          },
+        }}
+        bezier
+        style={styles.chartgraph}
+      />
     </Container>
   );
 });
+const generateRandomData = () => {
+  const currentDate = new Date();
+  const data = [];
 
-const getStyles = (theme: any) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.background,
-    },
-    nochartsimage: {
-      height: '30%',
-      width: '70%',
-    },
-    secontainer: {
-      ...defaultStyle.center,
-      height: '100%',
-      width: '100%',
-    },
-    salestext: {
-      fontWeight: '600',
-      color: 'gray',
-      fontSize: 14,
-      marginTop: 50,
-    },
-    salesdescription: {
-      color: 'gray',
-      fontSize: 14,
-      textAlign: 'center',
-      marginTop: 10,
-      paddingHorizontal: 80,
-    },
-  });
+  for (let i = 0; i < 5; i++) {
+    const month = currentDate.getMonth() + i;
+    const year = currentDate.getFullYear();
+
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    const monthAbbreviation = monthNames[month % 12];
+
+    const numberOfOrders = Math.floor(Math.random() * 151) + 50;
+
+    data.push({
+      month: monthAbbreviation,
+      orders: numberOfOrders,
+    });
+  }
+
+  return data;
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  chartgraph: {
+    marginVertical: 8,
+    borderRadius: 16,
+    marginLeft: 20,
+  },
+});
 
 export default FarmerAI;

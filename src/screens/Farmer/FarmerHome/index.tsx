@@ -53,8 +53,6 @@ const FarmerHome: React.FC<FarmerHomeProps> = memo(({navigation}) => {
     }
   }, [dispatch, user.id]);
 
-  // const getAiPredications = useCallback(async () => {}, []);
-
   useFocusEffect(
     React.useCallback(() => {
       getUser();
